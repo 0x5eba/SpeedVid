@@ -1,2 +1,2 @@
 # SpeedVid
-Speed up or Slow down any video
+Chome extension to Speed up or Slow down any video
