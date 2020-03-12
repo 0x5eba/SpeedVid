@@ -82,7 +82,7 @@ chrome.runtime.onConnect.addListener((port) => {
         }
     
         if(request.type === "changeVideo"){
-            curr_video = parseInt(request.video)
+            curr_video = request.video
             change()
         }
     })

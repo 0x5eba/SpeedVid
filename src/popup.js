@@ -4,15 +4,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
         var inputs = document.getElementById('inputs').getElementsByTagName('input')
         var curr_speed = "x1"
-        var curr_video = "0"
+        var curr_video = 0
 
         function changeHandlerSpeed(event) {
             curr_speed = this.value
-            port.postMessage({type: 'changeSpeed', "speed": curr_speed})
+            port.postMessage({"type": 'changeSpeed', "speed": curr_speed})
         }
         function changeHandlerVideo(event) {
             curr_video = this.value
-            port.postMessage({type: 'changeVideo', "video": curr_video})
+            if(typeof curr_video === "string"){
+                curr_video = parseInt(curr_video)
+            }
+            port.postMessage({"type": 'changeVideo', "video": curr_video})
         }
         Array.prototype.forEach.call(inputs, function(radio) {
             radio.addEventListener('change', changeHandlerSpeed);
