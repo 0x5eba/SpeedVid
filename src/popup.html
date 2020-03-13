@@ -10,6 +10,8 @@
 
     <link href="public/bootstrap.min.css" rel="stylesheet">
     <script src="public/bootstrap.min.js"></script>
+
+    <script src="popup.js"></script>
 </head>
 <body>
 
@@ -26,32 +28,26 @@
 
             <div class="col-md-6">
                 <div class="row justify-content-center">
-                    <!-- <button class="btns">
-                        <img src="icons/iconmonstr-previous-thin.svg" width="25" height="25">
-                    </button> -->
-
                     <button class="btns" style="margin-left: 0px">
-                        <img src="icons/iconmonstr-media-control-22.svg" width="25" height="25">
+                        <img src="icons/iconmonstr-media-control-22-240.png" width="25" height="25">
                     </button>
     
-                    <button class="btns">
-                        <img id="play-btn" src="icons/iconmonstr-play-thin.svg" width="30" height="30">
+                    <button class="btns" id="btn-play" onclick="pause()">
+                        <img id="play-btn" src="icons/iconmonstr-play-thin-240.png" width="30" height="30">
                     </button>
-    
-                    <button class="btns">
-                        <img src="icons/iconmonstr-media-control-17.svg" width="25" height="25">
-                    </button>
-    
-                    <!-- <button class="btns">
-                        <img src="icons/iconmonstr-next-thin.svg" width="25" height="25">
-                    </button> -->
-                </div>
 
+                    <button class="btns" style="display: none;" id="btn-pause" onclick="play()">
+                        <img id="pause-btn" src="icons/iconmonstr-pause-thin-240.png" width="30" height="30">
+                    </button>
+    
+                    <button class="btns">
+                        <img src="icons/iconmonstr-media-control-17-240.png" width="25" height="25">
+                    </button>
+                </div>
             </div>
 
             <div class="col-md-3 small_slider" style="display: table; margin: auto;">
                 <div class="row justify-content-center">
-                    <!-- <img src="icons/iconmonstr-sound-thin.svg" width="25" height="25" style="margin-right: 15px;"> -->
                     <input id="slider_volume" data-slider-min="0" data-slider-max="1.0" data-slider-step="0.01" data-slider-value="1"/>
                 </div>
                 <div class="row justify-content-center">
@@ -86,6 +82,10 @@
         </div>
     </div>
 
+    <div class="row justify-content-center" id="root2">
+        <h1>No video found</h1>
+    </div>
+
     
 </body>
 </html>
@@ -106,6 +106,24 @@
         /* #208A34 */
         font-size: 15px;
         padding: 10px;
+    }
+
+    #root2 {
+        min-width: 600px;
+        max-width: 600px;
+        min-height: 150px;
+        max-height: 150px;
+        background-color: #353535;
+        color: rgb(221, 220, 220);
+        /* #208A34 */
+        font-size: 15px;
+        padding: 10px;
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        display: none;
     }
 
     .center {
@@ -134,15 +152,16 @@
         margin-left: 30px;
         border: 0;
         background: transparent;
-        background-color: white;
+        /* background-color: black; */
         border-radius: 50px;
         height: 45px;
         width: 45px;
-        box-shadow: 1px 2px 1px rgba(0,0,0,.13);
         transform: scale(1.03);
         transition: all .1s;
         transform: translateZ(0);
         cursor: pointer;
+        box-shadow: 0 0 0 1.5px rgb(223, 223, 223);
+        /* outline: 1px solid white; */
     }
 
     .btns:active {
@@ -279,8 +298,14 @@
         $("#volume").text(parseInt(val))
     })
 
-    function clickBtns(){
-        document.getElementById("btn-back").style.transform = "scale(0.98)"
+    function play(){
+        document.getElementById("btn-pause").style.display = "none"
+        document.getElementById("btn-play").style.display = "block"
+    }
+
+    function pause(){
+        document.getElementById("btn-play").style.display = "none"
+        document.getElementById("btn-pause").style.display = "block"
     }
 
 </script>
