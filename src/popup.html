@@ -1,0 +1,161 @@
+<!DOCtype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+
+    <script src="public/jquery.js"></script>
+    <script src="public/slider.js"></script>
+    <link href="public/slider.css" rel="stylesheet">
+
+    <link href="public/bootstrap.min.css" rel="stylesheet">
+    <script src="public/bootstrap.min.js"></script>
+</head>
+<body>
+
+    <div class="container" id="root">
+        <div class="row justify-content-center">
+            <div class="col-md-3 small_slider" style="display: table; margin: auto;">
+                <div class="row justify-content-center">
+                    <input id="slider_speed" data-slider-min="0.1" data-slider-max="3.0" data-slider-step="0.1" data-slider-value="1"/>
+                </div>
+                <div class="row justify-content-center">
+                    <span>Speed: <span id="speed">1.0</span></span>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="row justify-content-center">
+                    <!-- <button class="btns">
+                        <img src="icons/iconmonstr-previous-thin.svg" width="25" height="25">
+                    </button> -->
+
+                    <button class="btns" style="margin-left: 0px">
+                        <img src="icons/iconmonstr-media-control-22.svg" width="25" height="25">
+                    </button>
+    
+                    <button class="btns">
+                        <img id="play-btn" src="icons/iconmonstr-play-thin.svg" width="30" height="30">
+                    </button>
+    
+                    <button class="btns">
+                        <img src="icons/iconmonstr-media-control-17.svg" width="25" height="25">
+                    </button>
+    
+                    <!-- <button class="btns">
+                        <img src="icons/iconmonstr-next-thin.svg" width="25" height="25">
+                    </button> -->
+                </div>
+
+            </div>
+
+            <div class="col-md-3 small_slider" style="display: table; margin: auto;">
+                <div class="row justify-content-center">
+                    <!-- <img src="icons/iconmonstr-sound-thin.svg" width="25" height="25" style="margin-right: 15px;"> -->
+                    <input id="slider_volume" data-slider-min="0" data-slider-max="1.0" data-slider-step="0.1" data-slider-value="1"/>
+                </div>
+                <div class="row justify-content-center">
+                    <span>Volume: <span id="volume">1.0</span></span>
+                </div>
+            </div>
+        </div>
+
+        <div id="big_slider" class="row justify-content-center" style="margin-top: 20px;">
+            <span id="timer">0</span>
+            <input id="slider_timer" data-slider-min="0" data-slider-max="600" data-slider-step="1" data-slider-value="0"/>
+            <span id="max_time">10</span>
+        </div>
+    </div>
+
+    
+</body>
+</html>
+
+<style>
+    #root {
+        min-width: 600px;
+        max-width: 600px;
+        min-height: 150px;
+        max-height: 150px;
+        border: 2px solid #282828;
+        background-color: #282828;
+        color: white;
+        /* #208A34 */
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    .center {
+        margin: 0 auto;
+    }
+
+    #timer {
+        padding-right: 15px;
+    }
+
+    #max_time {
+        padding-left: 20px;
+    }
+
+    #big_slider .slider-horizontal {
+        max-width: 400px;
+        min-width: 400px;
+    }
+
+    .small_slider .slider-horizontal {
+        max-width: 100px;
+        min-width: 100px;
+    }
+
+    .btns {
+        /* position: absolute; */
+        /* left: 10%;
+        margin-left: -22px;
+        margin-top: 20px; */
+        margin-left: 30px;
+        border: 0;
+        background: transparent;
+        background-color: white;
+        border-radius: 50px;
+        height: 45px;
+        width: 45px;
+        box-shadow: 1px 2px 1px rgba(0,0,0,.13);
+    }
+
+    #play-btn {
+        border-radius: 20%; 
+        /* padding-left: -3px; */
+        padding-left: 5px;
+    }
+
+    button:focus {
+        outline:0;
+    }
+
+    /* .slider-handle {
+        max-width: 15px;
+        max-height: 15px;
+    } */
+
+</style>
+
+<script>
+    $("#slider_speed").slider()
+    $("#slider_speed").on("slide", function(slideEvt) {
+        let val = slideEvt.value
+        $("#speed").text(val.toFixed(1))
+    })
+
+    $("#slider_timer").slider()
+    $("#slider_timer").on("slide", function(slideEvt) {
+        let val = slideEvt.value
+        $("#timer").text(val.toFixed(1))
+    })
+
+    $("#slider_volume").slider()
+    $("#slider_volume").on("slide", function(slideEvt) {
+        let val = slideEvt.value
+        $("#volume").text(val.toFixed(1))
+    })
+
+</script>
