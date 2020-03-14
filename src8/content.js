@@ -10,7 +10,7 @@ var setting = {
 var curr_video = 0
 
 function getAllVideos(){
-    var videos = document.querySelectorAll('video')
+    var videos2 = document.querySelectorAll('video')
     var iframes = document.querySelectorAll('iframe')
 
     function rec(list_iframes){
@@ -21,7 +21,7 @@ function getAllVideos(){
             var iFrameBody = list_iframes[a].contentDocument.getElementsByTagName('body')[0];
             let videos_iframe = iFrameBody.querySelectorAll('video')
             
-            videos = [...videos, ...videos_iframe];
+            videos2 = [...videos2, ...videos_iframe];
 
             let iframes_iframe = iFrameBody.querySelectorAll('iframe')
             if(iframes_iframe !== undefined && iframes_iframe.length !== 0){
@@ -33,21 +33,21 @@ function getAllVideos(){
         rec(iframes)
     }
 
-    return videos
+    return videos2
 }
 
-var videos = getAllVideos()
+var videos
+
+function sleepFor(sleepDuration){
+    var now = new Date().getTime();
+    while(new Date().getTime() < now + sleepDuration){} 
+}
 
 function update(videos){
-    function sleepFor(sleepDuration){
-        var now = new Date().getTime();
-        while(new Date().getTime() < now + sleepDuration){} 
-    }
-
     settings = []
     for(let a = 0; a < videos.length; ++a){
         while(true){
-            if(videos[a].duration === null){
+            if(videos[a].duration === null || videos[a].duration == undefined){
                 sleepFor(100)
             }
             break
@@ -62,10 +62,17 @@ function update(videos){
         settings.push(sett)
     }
 
+    settings = JSON.parse(JSON.stringify(settings))
+
     // chrome.storage.sync.set({"videos_settings": JSON.stringify(settings)}, function() {})
 }
 
+setTimeout(function(){
+    videos = getAllVideos()
+}, 700)
+
 window.setInterval(function(){
+    videos = getAllVideos()
     update(videos)
 }, 1000);
 
@@ -80,11 +87,8 @@ chrome.storage.onChanged.addListener(function(changes, area) {
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     if(request !== undefined && request.curr_setting !== undefined){
         let curr_setting = request.curr_setting
-        // videos[curr_video].currentTime = curr_setting.curr_time
         videos[curr_video].volume = curr_setting.volume
         videos[curr_video].playbackRate = curr_setting.speed
-
-        console.log(curr_setting)
 
         if(curr_setting.paused === true){
             videos[curr_video].pause()
@@ -92,8 +96,25 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             videos[curr_video].play()
         }
     }
-
-    if(request !== undefined && request.get_settings !== undefined){
-        sendResponse({"videos_settings": JSON.stringify(settings)})
+    else if(request !== undefined && request.get_settings !== undefined){
+        if(videos.length !== 0){
+            while(settings.length === undefined){
+                sleepFor(100)
+            }
+            while(videos.length !== settings.length){
+                sleepFor(100)
+            }
+            sendResponse({"videos_settings": JSON.stringify(settings)})
+        } else {
+            sendResponse({"videos_settings": JSON.stringify([])})
+        }
+    }
+    else if(request !== undefined && request.curr_time !== undefined){
+        videos[curr_video].currentTime = request.curr_time
+        settings[curr_video].curr_time = request.curr_time
+    }
+    else if(request !== undefined && request.get_curr_time !== undefined){
+        console.log(videos)
+        sendResponse({"get_curr_time": JSON.stringify(videos[curr_video].currentTime)})
     }
 })

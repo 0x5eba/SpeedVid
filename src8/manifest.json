@@ -10,7 +10,7 @@
       "js": ["content.js"]
     }
   ],
-  "permissions": ["activeTab", "storage"],
+  "permissions": ["activeTab", "storage", "alarms"],
   "browser_action": {
     "default_title": "SpeedVid",
     "default_popup": "popup.html",

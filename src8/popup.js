@@ -18,6 +18,12 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    function sendCurrTime(){
+        chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+            chrome.tabs.sendMessage(tabs[0].id, {"curr_time": curr_setting.curr_time}, function(response) {});
+        });
+    }
+
     $("#slider_speed").slider()
     $("#slider_speed").on("slide", function(slideEvt) {
         let val = slideEvt.value
@@ -31,7 +37,7 @@ document.addEventListener('DOMContentLoaded', function () {
         let val = slideEvt.value
         $("#timer").text(val)
         curr_setting.curr_time = parseInt(val)
-        sendMessage()
+        sendCurrTime()
     })
 
     $("#slider_volume").slider()
@@ -59,13 +65,13 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById("btn-forward").onclick = function() {
         curr_setting.curr_time += 30
         curr_setting.curr_time = Math.min(curr_setting.curr_time, videos_settings[curr_video].duration)
-        sendMessage()
+        sendCurrTime()
     }
 
     document.getElementById("btn-back").onclick = function() {
         curr_setting.curr_time -= 30
         curr_setting.curr_time = Math.max(curr_setting.curr_time, 0)
-        sendMessage()
+        sendCurrTime()
     }
 
     function getIdxCurrVideo(){
@@ -95,27 +101,27 @@ document.addEventListener('DOMContentLoaded', function () {
         select.appendChild(label)
     }
 
-    function changeVideoSettings(curr_setting){
+    function changeVideoSettings(curr_setting2){
         $("#slider_timer").slider("destroy")
         $("#slider_timer").slider({
-            min: 0, // min value
-            max: curr_setting.duration, // max value
+            min: 0,
+            max: curr_setting2.duration,
             step: 1,
-            value: curr_setting.curr_time, // default value of slider
+            value: curr_setting2.curr_time,
         })
         $("#slider_timer").on("slide", function(slideEvt) {
             let val = slideEvt.value
             $("#timer").text(parseInt(val))
             curr_setting.curr_time = parseInt(val)
-            sendMessage()
+            sendCurrTime()
         })
 
         $("#slider_volume").slider("destroy")
         $("#slider_volume").slider({
-            min: 0, // min value
-            max: 1, // max value
-            step: 0.1,
-            value: curr_setting.volume, // default value of slider
+            min: 0,
+            max: 1,
+            step: 0.01,
+            value: curr_setting2.volume,
         })
         $("#slider_volume").on("slide", function(slideEvt) {
             let val = slideEvt.value*100
@@ -126,10 +132,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
         $("#slider_speed").slider("destroy")
         $("#slider_speed").slider({
-            min: 0.1, // min value
-            max: 3.0, // max value
+            min: 0.1,
+            max: 3.0,
             step: 0.1,
-            value: curr_setting.speed, // default value of slider
+            value: curr_setting2.speed,
         })
         $("#slider_speed").on("slide", function(slideEvt) {
             let val = slideEvt.value
@@ -138,12 +144,12 @@ document.addEventListener('DOMContentLoaded', function () {
             sendMessage()
         })
 
-        $("#speed").text(parseFloat(curr_setting.speed))
-        $("#timer").text(parseInt(curr_setting.curr_time))
-        $("#volume").text(parseInt(curr_setting.volume*100))
-        $("#max_time").text(parseInt(curr_setting.duration))
+        $("#speed").text(parseFloat(curr_setting2.speed))
+        $("#timer").text(parseInt(curr_setting2.curr_time))
+        $("#volume").text(parseInt(curr_setting2.volume*100))
+        $("#max_time").text(parseInt(curr_setting2.duration))
 
-        if(curr_setting.paused === false){ // mostro il tasto play quando e' in pausa
+        if(curr_setting2.paused === false){ 
             document.getElementById("btn-play").style.display = "none"
             document.getElementById("btn-pause").style.display = "block"
         } else {
@@ -153,13 +159,13 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     setTimeout(function(){ 
-        chrome.storage.sync.get("curr_video", function(storage){
-            if(storage !== undefined && storage.curr_video !== undefined){
-                curr_video = parseInt(storage.curr_video)
-            } else {
-                curr_video = 0
-            }
-        })
+        // chrome.storage.sync.get("curr_video", function(storage){
+        //     if(storage !== undefined && storage.curr_video !== undefined){
+        //         curr_video = parseInt(storage.curr_video)
+        //     } else {
+        //         curr_video = 0
+        //     }
+        // })
 
         chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
             chrome.tabs.sendMessage(tabs[0].id, {"get_settings": true}, function(storage) {
@@ -167,7 +173,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     videos_settings = JSON.parse(storage.videos_settings)
 
                     tot_video = videos_settings.length
-    
+
                     for(let a = 0; a < tot_video; ++a){
                         addVideo(a === curr_video)
                     }
@@ -178,9 +184,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     } else {
                         document.getElementById("root").style.display = "block"
                         document.getElementById("root2").style.display = "none"
-
-                        changeVideoSettings(videos_settings[curr_video])
+                        
                         curr_setting = videos_settings[curr_video]
+                        changeVideoSettings(curr_setting)
                     }
                 }
             })
@@ -191,22 +197,35 @@ document.addEventListener('DOMContentLoaded', function () {
             if(new_curr_video !== curr_video){
                 curr_video = new_curr_video
                 chrome.storage.sync.set({"curr_video": curr_video}, function() {})
-                
-                // changeVideoSettings(videos_settings[curr_video])
-                // curr_setting = videos_settings[curr_video]
-
-                // TODO va cambiato videos_settings
             }
         }, 500);
+
+        window.setInterval(function(){
+            chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+                chrome.tabs.sendMessage(tabs[0].id, {"get_curr_time": true}, function(storage) {
+                    if(storage !== undefined && storage.get_curr_time !== undefined){
+                        let val = parseInt(JSON.parse(storage.get_curr_time))
+                        $("#timer").text(val)
+                        curr_setting.curr_time = val
+
+                        // $("#slider_timer").slider("destroy")
+                        // $("#slider_timer").slider({
+                        //     min: 0,
+                        //     max: curr_setting.duration,
+                        //     step: 1,
+                        //     value: curr_setting.curr_time,
+                        // })
+                        // $("#slider_timer").on("slide", function(slideEvt) {
+                        //     let val2 = parseInt(slideEvt.value)
+                        //     $("#timer").text(val2)
+                        //     curr_setting.curr_time = val2
+                        //     sendCurrTime()
+                        // })
+                    }
+                })
+            })
+        }, 300)
+
     }, 500)
-
-
-    // chrome.storage.onChanged.addListener(function(changes, area) {
-    //     if(area === "sync"){
-    //         if(changes.videos_settings !== undefined){
-    //             videos_settings 
-    //         }
-    //     }
-    // })
 
 }, false)
