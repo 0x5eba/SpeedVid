@@ -1,67 +1,99 @@
 document.addEventListener('DOMContentLoaded', function () {
-    chrome.tabs.query({currentWindow: true, active: true}, function (tabs) {
-        const port = chrome.tabs.connect(tabs[0].id)
+    tot_video = 0
+    curr_video = 0
 
-        var inputs = document.getElementById('inputs').getElementsByTagName('input')
-        var curr_speed = "x1"
-        var curr_video = 0
-
-        function changeHandlerSpeed(event) {
-            curr_speed = this.value
-            port.postMessage({"type": 'changeSpeed', "speed": curr_speed})
+    chrome.storage.sync.get("curr_video", function(storage){
+        if(storage !== undefined && storage.curr_video !== undefined){
+            curr_video = parseInt(storage.curr_video)
         }
-        function changeHandlerVideo(event) {
-            curr_video = this.value
-            if(typeof curr_video === "string"){
-                curr_video = parseInt(curr_video)
-            }
-            port.postMessage({"type": 'changeVideo', "video": curr_video})
-        }
-        Array.prototype.forEach.call(inputs, function(radio) {
-            radio.addEventListener('change', changeHandlerSpeed);
-        })
-
-        port.onMessage.addListener((message) => {
-            if(message !== undefined && message.tot_videos !== undefined){
-                let tot_videos = message.tot_videos
-
-                let div = document.createElement("div")
-                div.id = "videos"
-                div.style.marginTop = "10px"
-                let label = document.createElement("label")
-                if(tot_videos > 0){
-                    label.innerHTML = "video: "
-                } else {
-                    label.innerHTML = "No video found"
-                }
-                
-                div.append(label)
-                for(let a = 0; a < tot_videos; ++a){
-                    let inp = document.createElement("input")
-                    inp.type = "Radio"
-                    let name = (a+1).toString()
-                    inp.value = (a).toString()
-                    inp.name = "numVideo"
-
-                    if(a == 0){
-                        inp.checked = true
-                    }
-
-                    inp.addEventListener('change', changeHandlerVideo);
-
-                    let label = document.createElement("label")
-                    label.innerHTML = name
-
-                    div.append(inp, label)
-                }
-                document.getElementById("root").append(div)
-            }
-        })
-
-        function getAllVideos(){
-            port.postMessage({type: 'getAllVideos'})
-        }
-
-        getAllVideos()
     })
+
+    $("#slider_speed").slider()
+    $("#slider_speed").on("slide", function(slideEvt) {
+        let val = slideEvt.value
+        $("#speed").text(val.toFixed(1))
+    })
+
+    $("#slider_timer").slider()
+    $("#slider_timer").on("slide", function(slideEvt) {
+        let val = slideEvt.value
+        $("#timer").text(val)
+    })
+
+    $("#slider_volume").slider()
+    $("#slider_volume").on("slide", function(slideEvt) {
+        let val = slideEvt.value*100
+        $("#volume").text(parseInt(val))
+    })
+
+    document.getElementById("btn-pause").onclick = function() {
+        document.getElementById("btn-pause").style.display = "none"
+        document.getElementById("btn-play").style.display = "block"
+        chrome.storage.sync.set({"pause": true}, function() {})
+    }
+
+    document.getElementById("btn-play").onclick = function() {
+        document.getElementById("btn-play").style.display = "none"
+        document.getElementById("btn-pause").style.display = "block"
+        chrome.storage.sync.set({"play": true}, function() {})
+    }
+
+    document.getElementById("btn-forward").onclick = function() {
+        chrome.storage.sync.set({"forward": true}, function() {})
+    }
+
+    document.getElementById("btn-back").onclick = function() {
+        chrome.storage.sync.set({"back": true}, function() {})
+    }
+
+    function getIdxCurrVideo(){
+        let select = document.getElementById("btns-videos")
+        let inputs = select.querySelectorAll('input')
+        for(let a = 0; a < inputs.length; ++a){
+            if(inputs[a].checked === true){
+                return a
+            }
+        }
+        return -1
+    }
+
+    function addVideo(first){
+        let select = document.getElementById("btns-videos")
+        let label = document.createElement("label")
+        let input = document.createElement("input")
+        input.type = "radio"
+        input.name = "dark"
+        if(first === true){
+            input.checked = true
+        }
+        let span = document.createElement("span")
+        span.className = "design"
+        label.appendChild(input)
+        label.appendChild(span)
+        select.appendChild(label)
+    }
+
+    setTimeout(function(){ 
+        chrome.storage.sync.get("tot_videos", function(storage){
+            tot_video = parseInt(storage.tot_videos)
+
+            for(let a = 0; a < tot_video; ++a){
+                addVideo(a === 0)
+            }
+        
+            if(tot_video === 0){
+                document.getElementById("root").style.display = "none"
+                document.getElementById("root2").style.display = "block"
+            } else {
+                document.getElementById("root").style.display = "block"
+                document.getElementById("root2").style.display = "none"
+            }
+        })
+
+        window.setInterval(function(){
+            curr_video = getIdxCurrVideo()
+            chrome.storage.sync.set({"curr_video": curr_video}, function() {})
+        }, 500);
+    }, 500)
+
 }, false)

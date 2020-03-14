@@ -1,89 +1,55 @@
-var curr_speed = "x1"
-var curr_video = -1
+var settings = {
+    src: "",
+    duration: 0,
+    curr_time: 0,
+    paused: false,
+    played: false,
+    volume: 1,
+}
 
-chrome.runtime.onConnect.addListener((port) => {
-    port.onMessage.addListener((request) => {
-        if(request.type === "getAllVideos"){
-            var videos = document.querySelectorAll('video')
-            var iframes = document.querySelectorAll('iframe')
-    
-            var len_videos = videos.length
-    
-            function getFrameContents(id_iframe){
-                var iFrame = document.getElementById(id_iframe);
-                var iFrameBody;
-                if (iFrame.contentDocument) {
-                    iFrameBody = iFrame.contentDocument.getElementsByTagName('body')[0];
-                } else if (iFrame.contentWindow){
-                    iFrameBody = iFrame.contentWindow.document.getElementsByTagName('body')[0];
-                }
-    
-                var videos_iframe = iFrameBody.querySelectorAll('video')
-                len_videos += videos_iframe.length
-            }
-            
-            for(let a = 0; a < iframes.length; ++a){
-                let id = iframes[a].id
-                getFrameContents(id)
-            }
-    
-            port.postMessage({"tot_videos": len_videos})
-        }
+function getAllVideos(){
+    var videos = document.querySelectorAll('video')
+    var iframes = document.querySelectorAll('iframe')
 
-        function change(){
-            let videos = document.querySelectorAll('video')
-            let iframes = document.querySelectorAll('iframe')
-    
-            function getFrameContents(id_iframe){
-                var iFrame = document.getElementById(id_iframe);
-                var iFrameBody;
-                if (iFrame.contentDocument) {
-                    iFrameBody = iFrame.contentDocument.getElementsByTagName('body')[0];
-                } else if (iFrame.contentWindow){
-                    iFrameBody = iFrame.contentWindow.document.getElementsByTagName('body')[0];
-                }
-    
-                let videos_iframe = iFrameBody.querySelectorAll('video')
-                
-                videos = [...videos, ...videos_iframe];
+    function rec(list_iframes){
+        for(let a = 0; a < list_iframes.length; ++a){
+            if(list_iframes[a] === null || list_iframes[a].contentDocument === null){
+                continue
             }
-    
-            for(let a = 0; a < iframes.length; ++a){
-                let id = iframes[a].id
-                getFrameContents(id)
-            }
+            var iFrameBody = list_iframes[a].contentDocument.getElementsByTagName('body')[0];
+            let videos_iframe = iFrameBody.querySelectorAll('video')
             
-            var speed = 1
-            if(curr_speed === "x05"){
-                speed = 0.5
-            } else if(curr_speed === "x1"){
-                speede = 1
-            } else if(curr_speed === "x15"){
-                speed = 1.5
-            } else if(curr_speed === "x2"){
-                speed = 2
-            } else if(curr_speed === "x3"){
-                speed = 3
-            }
-    
-            if(curr_video === -1){
-                if(videos.length > 0){
-                    curr_video = 0
-                    videos[curr_video].playbackRate = speed
-                }
-            } else {
-                videos[curr_video].playbackRate = speed
+            videos = [...videos, ...videos_iframe];
+
+            let iframes_iframe = iFrameBody.querySelectorAll('iframe')
+            if(iframes_iframe !== undefined && iframes_iframe.length !== 0){
+                rec(iframes_iframe)
             }
         }
+    }
+    if(iframes !== undefined && iframes.length !== 0){
+        rec(iframes)
+    }
     
-        if(request.type === "changeSpeed"){
-            curr_speed = request.speed
-            change()
+    chrome.storage.sync.set({"tot_videos": JSON.stringify(videos.length)}, function() {})
+
+    return videos
+}
+
+var videos = getAllVideos()
+
+chrome.storage.onChanged.addListener(function(changes, area) {
+    if(area === "sync"){
+        if(changes === "curr_video"){
+            
         }
-    
-        if(request.type === "changeVideo"){
-            curr_video = request.video
-            change()
-        }
-    })
+    }
 })
+
+// setTimeout(function(){ 
+//     // window.setInterval(function(){
+//     //     chrome.storage.sync.get("curr_video", function(storage){
+//     //         console.log(storage)
+//     //     })
+//     // }, 1000);
+// }, 3000)

@@ -14,10 +14,9 @@
     <script src="popup.js"></script>
 </head>
 <body>
-
-    <div class="container" id="root">
+    <div id="root">
         <div class="row justify-content-center">
-            <div class="col-md-3 small_slider" style="display: table; margin: auto;">
+            <div class="col-md-3 small_slider" style="display: table; margin: auto; max-width: 100px;">
                 <div class="row justify-content-center">
                     <input id="slider_speed" data-slider-min="0.1" data-slider-max="3.0" data-slider-step="0.1" data-slider-value="1"/>
                 </div>
@@ -26,27 +25,27 @@
                 </div>
             </div>
 
-            <div class="col-md-6">
+            <div class="col-md-6" style="max-width: 300px;">
                 <div class="row justify-content-center">
-                    <button class="btns" style="margin-left: 0px">
+                    <button class="btns" id="btn-back" style="margin-left: 0px">
                         <img src="icons/iconmonstr-media-control-22-240.png" width="25" height="25">
                     </button>
     
-                    <button class="btns" id="btn-play" onclick="pause()">
+                    <button class="btns" id="btn-play">
                         <img id="play-btn" src="icons/iconmonstr-play-thin-240.png" width="30" height="30">
                     </button>
 
-                    <button class="btns" style="display: none;" id="btn-pause" onclick="play()">
+                    <button class="btns" style="display: none;" id="btn-pause">
                         <img id="pause-btn" src="icons/iconmonstr-pause-thin-240.png" width="30" height="30">
                     </button>
     
-                    <button class="btns">
+                    <button class="btns" id="btn-forward">
                         <img src="icons/iconmonstr-media-control-17-240.png" width="25" height="25">
                     </button>
                 </div>
             </div>
 
-            <div class="col-md-3 small_slider" style="display: table; margin: auto;">
+            <div class="col-md-3 small_slider" style="display: table; margin: auto; max-width: 100px;">
                 <div class="row justify-content-center">
                     <input id="slider_volume" data-slider-min="0" data-slider-max="1.0" data-slider-step="0.01" data-slider-value="1"/>
                 </div>
@@ -63,26 +62,16 @@
         </div>
 
         <div class="row justify-content-center" style="margin-top: 20px;">
-            <section class="dark">
-                <label>
+            <section class="dark" id="btns-videos">
+                <!-- <label>
                   <input type="radio" name="dark" checked>
                   <span class="design"></span>
-                </label>
-              
-                <label>
-                  <input type="radio" name="dark">
-                  <span class="design"></span>
-                </label>
-              
-                <label>
-                  <input type="radio" name="dark">
-                  <span class="design"></span>
-                </label>
+                </label> -->
             </section>
         </div>
     </div>
 
-    <div class="row justify-content-center" id="root2">
+    <div id="root2">
         <h1>No video found</h1>
     </div>
 
@@ -106,6 +95,7 @@
         /* #208A34 */
         font-size: 15px;
         padding: 10px;
+        padding-top: 20px;
     }
 
     #root2 {
@@ -160,7 +150,7 @@
         transition: all .1s;
         transform: translateZ(0);
         cursor: pointer;
-        box-shadow: 0 0 0 1.5px rgb(223, 223, 223);
+        box-shadow: 0 0 0 2px rgb(223, 223, 223);
         /* outline: 1px solid white; */
     }
 
@@ -278,34 +268,3 @@
     }
 
 </style>
-
-<script>
-    $("#slider_speed").slider()
-    $("#slider_speed").on("slide", function(slideEvt) {
-        let val = slideEvt.value
-        $("#speed").text(val.toFixed(1))
-    })
-
-    $("#slider_timer").slider()
-    $("#slider_timer").on("slide", function(slideEvt) {
-        let val = slideEvt.value
-        $("#timer").text(val)
-    })
-
-    $("#slider_volume").slider()
-    $("#slider_volume").on("slide", function(slideEvt) {
-        let val = slideEvt.value*100
-        $("#volume").text(parseInt(val))
-    })
-
-    function play(){
-        document.getElementById("btn-pause").style.display = "none"
-        document.getElementById("btn-play").style.display = "block"
-    }
-
-    function pause(){
-        document.getElementById("btn-play").style.display = "none"
-        document.getElementById("btn-pause").style.display = "block"
-    }
-
-</script>
