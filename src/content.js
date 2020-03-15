@@ -36,18 +36,27 @@ function getAllVideos(){
     return videos2
 }
 
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+async function sleepFor(time_sleep) {
+    await sleep(time_sleep)
+}
+
 function update(videos2){
     settings_tmp = []
     for(let a = 0; a < videos2.length; ++a){
-        while(true){
-            if(videos2[a].duration === null || videos2[a].duration == undefined){
-                sleepFor(100)
-            }
-            break
-        }
-        let sett = JSON.parse(JSON.stringify(setting))
-        sett.src = videos2[a].src + " - " + videos2[a].currentSrc
+        var sett = JSON.parse(JSON.stringify(setting))
+        // while(true){
+        //     if(isNaN(videos2[a].duration) || videos2[a].duration === null || videos2[a].duration === undefined){
+        //         sleepFor(100)
+        //     }
+        //     console.log(videos2[a].duration, isNaN(videos2[a].duration))
+        //     sett.duration = videos2[a].duration
+        //     break
+        // }
         sett.duration = videos2[a].duration
+        sett.src = videos2[a].src + " - " + videos2[a].currentSrc
         sett.curr_time = videos2[a].currentTime
         sett.paused = videos2[a].paused
         sett.volume = videos2[a].volume
@@ -64,10 +73,7 @@ var videos = getAllVideos()
 update(videos)
 // console.log("Get videos", videos)
 
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-async function sleepFor(time_sleep) {
+async function updateVideo(time_sleep) {
     while(true){
         await sleep(time_sleep)
 
@@ -76,12 +82,13 @@ async function sleepFor(time_sleep) {
         update(videos)
     }
 }
-sleepFor(1000)
+updateVideo(1000)
 
 chrome.storage.onChanged.addListener(function(changes, area) {
     if(area === "sync"){
         if(changes.curr_video !== undefined){
             curr_video = changes.curr_video.newValue
+            videos[curr_video].scrollIntoView();
         }
     }
 })
@@ -99,7 +106,6 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         }
     }
     else if(request !== undefined && request.get_settings !== undefined){
-        // console.log("1", videos, settings)
         if(videos.length !== 0){
             // while(settings.length === undefined){
             //     sleepFor(100)
@@ -107,6 +113,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             // while(videos.length !== settings.length){
             //     sleepFor(100)
             // }
+            videos[curr_video].scrollIntoView();
             sendResponse({"videos_settings": JSON.stringify(settings)})
         } else {
             sendResponse({"videos_settings": JSON.stringify([])})

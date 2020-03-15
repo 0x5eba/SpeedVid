@@ -85,17 +85,20 @@ document.addEventListener('DOMContentLoaded', function () {
         return -1
     }
 
-    function addVideo(first){
+    function addVideo(first, checked){
         let select = document.getElementById("btns-videos")
         let label = document.createElement("label")
         let input = document.createElement("input")
         input.type = "radio"
         input.name = "dark"
-        if(first === true){
+        if(checked === true){
             input.checked = true
         }
         let span = document.createElement("span")
         span.className = "design"
+        // if(first === true){
+        //     span.style.marginRight = "0px"
+        // }
         label.appendChild(input)
         label.appendChild(span)
         select.appendChild(label)
@@ -175,7 +178,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     tot_video = videos_settings.length
 
                     for(let a = 0; a < tot_video; ++a){
-                        addVideo(a === curr_video)
+                        addVideo(a === 0, a === curr_video)
                     }
                     
                     if(tot_video === 0){

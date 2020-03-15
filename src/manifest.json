@@ -1,6 +1,6 @@
 {
   "name": "SpeedVid",
-  "version": "0.2",
+  "version": "0.3.1",
   "manifest_version": 2,
   "content_scripts": [
     {
@@ -10,7 +10,7 @@
       "js": ["content.js"]
     }
   ],
-  "permissions": ["activeTab", "storage", "alarms"],
+  "permissions": ["activeTab", "storage"],
   "browser_action": {
     "default_title": "SpeedVid",
     "default_popup": "popup.html",
