@@ -1,5 +1,12 @@
 # SpeedVid
-Chrome extension to Speed up or Slow down any video
+
+![alt text](https://github.com/0x5eba/SpeedVid/blob/master/img/screen.png "Screen")
+
+Chrome extension: Video media controller for videos in any website, like Facebook, Instagram, Youtube, and every video in streaming.
+
+Detect every video in the website in real time, and moves to the position of the selected video. 
+
+You can slow down, speed up, change the volume, moving forward or backward of 30 seconds, or directly change the playback position of any video.
 
 ## Local Setup
 1. Go to [chrome://extensions](chrome://extensions/)
