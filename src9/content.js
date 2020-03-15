@@ -36,45 +36,47 @@ function getAllVideos(){
     return videos2
 }
 
-var videos
-
-function sleepFor(sleepDuration){
-    var now = new Date().getTime();
-    while(new Date().getTime() < now + sleepDuration){} 
-}
-
-function update(videos){
-    settings = []
-    for(let a = 0; a < videos.length; ++a){
+function update(videos2){
+    settings_tmp = []
+    for(let a = 0; a < videos2.length; ++a){
         while(true){
-            if(videos[a].duration === null || videos[a].duration == undefined){
+            if(videos2[a].duration === null || videos2[a].duration == undefined){
                 sleepFor(100)
             }
             break
         }
         let sett = JSON.parse(JSON.stringify(setting))
-        sett.src = videos[a].src + " - " + videos[a].currentSrc
-        sett.duration = videos[a].duration
-        sett.curr_time = videos[a].currentTime
-        sett.paused = videos[a].paused
-        sett.volume = videos[a].volume
-        sett.speed = videos[a].playbackRate
-        settings.push(sett)
+        sett.src = videos2[a].src + " - " + videos2[a].currentSrc
+        sett.duration = videos2[a].duration
+        sett.curr_time = videos2[a].currentTime
+        sett.paused = videos2[a].paused
+        sett.volume = videos2[a].volume
+        sett.speed = videos2[a].playbackRate
+        settings_tmp.push(sett)
     }
 
-    settings = JSON.parse(JSON.stringify(settings))
+    settings = JSON.parse(JSON.stringify(settings_tmp))
 
     // chrome.storage.sync.set({"videos_settings": JSON.stringify(settings)}, function() {})
 }
 
-setTimeout(function(){
-    videos = getAllVideos()
-}, 700)
+var videos = getAllVideos()
+update(videos)
+// console.log("Get videos", videos)
 
-window.setInterval(function(){
-    videos = getAllVideos()
-    update(videos)
-}, 1000);
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+async function sleepFor(time_sleep) {
+    while(true){
+        await sleep(time_sleep)
+
+        videos = getAllVideos()
+        // console.log(videos)
+        update(videos)
+    }
+}
+sleepFor(1000)
 
 chrome.storage.onChanged.addListener(function(changes, area) {
     if(area === "sync"){
@@ -97,13 +99,14 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         }
     }
     else if(request !== undefined && request.get_settings !== undefined){
+        // console.log("1", videos, settings)
         if(videos.length !== 0){
-            while(settings.length === undefined){
-                sleepFor(100)
-            }
-            while(videos.length !== settings.length){
-                sleepFor(100)
-            }
+            // while(settings.length === undefined){
+            //     sleepFor(100)
+            // }
+            // while(videos.length !== settings.length){
+            //     sleepFor(100)
+            // }
             sendResponse({"videos_settings": JSON.stringify(settings)})
         } else {
             sendResponse({"videos_settings": JSON.stringify([])})
@@ -114,7 +117,10 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         settings[curr_video].curr_time = request.curr_time
     }
     else if(request !== undefined && request.get_curr_time !== undefined){
-        console.log(videos)
+        // while(videos.length === 0 && settings.length !== 0){
+        //     sleepFor(100)
+        // }
+        // console.log("2", videos)
         sendResponse({"get_curr_time": JSON.stringify(videos[curr_video].currentTime)})
     }
 })
