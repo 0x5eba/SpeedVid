@@ -1,7 +1,7 @@
 {
   "name": "SpeedVid Video Media Controller",
   "short_name": "SpeedVid",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "manifest_version": 2,
   "description": "Video media controller for videos in any website, like Facebook, Instagram, Youtube, and every video in streaming.",
   "homepage_url": "https://github.com/0x5eba/SpeedVid",
